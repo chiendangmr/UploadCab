@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="HDValidator" GeneratedClassName="AppSettings">
+  <Profiles />
+  <Settings>
+    <Setting Name="FileFilter" Type="System.String" Scope="User">
+      <Value Profile="(Default)">*.mxf;*.mp4</Value>
+    </Setting>
+    <Setting Name="ConnectionString" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Server=10.10.10.101;uid=sa;pwd=Hd123456!DB;database=HDStation2</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

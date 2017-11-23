@@ -69,11 +69,11 @@ namespace HDExportMetadataAndFile
                         useSeason = ckSeason.Checked,
                         useTenCTAdd = ckTenCTAdd.Checked,
                         useTenCT = ckTenCT.Checked,
-                        useMaBang = ckMaBang.Checked 
+                        useMaBang = ckMaBang.Checked
                     });
                     (bsConfig.List as BindingList<View.GlobalObj>).ToList().SaveObject(userConfigPath);
                     HDMessageBox.Show("Lưu cấu hình thành công!", "Chú ý", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    
+
                     ckEditMode.Checked = false;
                     this.WindowState = FormWindowState.Minimized;
                     if (thrMain != null)
@@ -207,6 +207,7 @@ namespace HDExportMetadataAndFile
                     {
                         File.Create(logFile).Dispose();
                     }
+
                     using (var db = new SqlConnection(connectionStr))
                     {
                         try
@@ -261,6 +262,7 @@ namespace HDExportMetadataAndFile
                                                     catch (Exception ex)
                                                     {
                                                         addLog(logFile, "Khong load dc user config: " + ex.ToString());
+                                                        DeleteFileOverLength(logFile);
                                                     }
                                                 }
                                                 else
@@ -279,8 +281,8 @@ namespace HDExportMetadataAndFile
                                                         var ProgramName = filesDB.CommingNextNow == null ? " " : filesDB.CommingNextNow;
                                                         ProgramName = ProgramName.Replace("-", "").Replace("*", "").Replace("\'", "").Replace(":", "").Replace("\\", "").Replace("/", "").Replace("@", "").Replace("$", "").Replace("\"", "").Trim();
                                                         var creatDate = DateTime.Now;//filesDB.CREATE_DATE == null ? DateTime.Now : filesDB.CREATE_DATE;
-                                                    var broadcastDate = DateTime.Now;//filesDB.DATE_TO_BROADCAST == null ? DateTime.Now : filesDB.DATE_TO_BROADCAST;
-                                                    var startRight = filesDB.START_RIGHTS == null ? DateTime.Now : filesDB.START_RIGHTS;
+                                                        var broadcastDate = DateTime.Now;//filesDB.DATE_TO_BROADCAST == null ? DateTime.Now : filesDB.DATE_TO_BROADCAST;
+                                                        var startRight = filesDB.START_RIGHTS == null ? DateTime.Now : filesDB.START_RIGHTS;
                                                         var endRight = filesDB.END_RIGHTS == null ? DateTime.Now.AddYears(1) : filesDB.END_RIGHTS;
                                                         var season = filesDB.Season == null ? " " : filesDB.Season;
                                                         var episode = filesDB.EPISODE_NUMBER == null ? 0 : filesDB.EPISODE_NUMBER;
@@ -321,17 +323,17 @@ namespace HDExportMetadataAndFile
                                                         string addSymbol = (txtSymbol.Text != " " && txtSymbol.Text != "") ? txtSymbol.Text : "";
                                                         string srcPath = "ftp://" + filesDB.NAS_IP + ":" + filesDB.PORT;
 
-                                                    #region Export từ nas này sang nas khác
-                                                    if (txtNasIP.Text != null && txtNasIP.Text != "" && txtNasUsername.Text != null && txtNasUsername.Text != "" && txtNasPass.Text != null && txtNasPass.Text != "" && txtNasPath.Text != null && txtNasPath.Text != "")
+                                                        #region Export từ nas này sang nas khác
+                                                        if (txtNasIP.Text != null && txtNasIP.Text != "" && txtNasUsername.Text != null && txtNasUsername.Text != "" && txtNasPass.Text != null && txtNasPass.Text != "" && txtNasPath.Text != null && txtNasPath.Text != "")
                                                         {
                                                             var tempTargetPath = "ftp://" + txtNasIP.Text + ":" + nNasPort.Value.ToString() + txtNasPath.Text;
 
-                                                        #region Export XML
-                                                        if (ckXml.Checked)
+                                                            #region Export XML
+                                                            if (ckXml.Checked)
                                                             {
                                                                 int epiNum = getEpisodeNUmber(ProgramName);
-                                                            #region Phim le
-                                                            if (epiNum == 0)
+                                                                #region Phim le
+                                                                if (epiNum == 0)
                                                                 {
                                                                     try
                                                                     {
@@ -456,12 +458,13 @@ namespace HDExportMetadataAndFile
                                                                     catch (Exception ex)
                                                                     {
                                                                         addLog(logFile, "Xuat xml sang unc path tu nas ko thanh cong: " + ex.ToString());
+                                                                        DeleteFileOverLength(logFile);
                                                                     }
-                                                                #endregion
-                                                            }
-                                                            #region Tap 1 phim bo
-                                                            else //if (epiNum == 1)
-                                                            {
+                                                                    #endregion
+                                                                }
+                                                                #region Tap 1 phim bo
+                                                                else //if (epiNum == 1)
+                                                                {
                                                                     try
                                                                     {
                                                                         View.XMLLongChildObject xmlChild = new View.XMLLongChildObject()
@@ -597,96 +600,97 @@ namespace HDExportMetadataAndFile
                                                                     catch (Exception ex)
                                                                     {
                                                                         addLog(logFile, "Xuat xml sang unc path tu nas ko thanh cong: " + ex.ToString());
+                                                                        DeleteFileOverLength(logFile);
                                                                     }
+                                                                    #endregion
+                                                                }
+                                                                #region tap 2 tro len phim bo
+                                                                //else
+                                                                //{
+                                                                //    try
+                                                                //    {
+                                                                //        View.XMLShortChildObject xmlChild = new View.XMLShortChildObject()
+                                                                //        {
+                                                                //            rootID = "GLOBAL",
+                                                                //            rootScheduleDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
+
+                                                                //            contentNumber = epiNum.ToString(),
+                                                                //            contentSeriesRef = Utils.ConvertToVietnameseNonSign(ProgramName.Remove(ProgramName.LastIndexOf(epiNum.ToString()))).Replace(" ", "").ToLower() + "s",
+                                                                //            contentAction = "override",
+                                                                //            contentActors = filesDB.ACTOR,
+                                                                //            contentAspect = filesDB.ASPECT_RATIO,
+                                                                //            contentCategories = "",
+                                                                //            contentContentAction = "override",
+                                                                //            contentContentDefinition = filesDB.VIDEO_FORMAT,
+                                                                //            contentContentEncProfileName = "",
+                                                                //            contentContentID = Utils.ConvertToVietnameseNonSign(ProgramName).Replace(" ", "").ToLower() + "p",
+                                                                //            contentContentPreLoaded = "false",
+                                                                //            contentContentStartDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
+                                                                //            contentContentTitle = Utils.ConvertToVietnameseNonSign(ProgramName),
+                                                                //            contentCountries = "",
+                                                                //            contentDirectors = filesDB.DIRECTOR,
+                                                                //            contentDuration = ((int)TimeSpan.Parse(filesDB.TC_OUT).TotalSeconds).ToString(),
+                                                                //            contentID = Utils.ConvertToVietnameseNonSign(ProgramName).Replace(" ", "").ToLower() + "m",
+                                                                //            contentIsRecordable = "0",
+                                                                //            contentLanguage = "",
+                                                                //            contentMediaAction = "override",
+                                                                //            contentMediaFilename = Path.GetFileName(filesDB.FILE_NAME),
+                                                                //            contentMediaFileSize = filesDB.FILE_SIZE.ToString(),
+                                                                //            contentMediaFormat = "AV_ClearTS",
+                                                                //            contentMediaFrameDuration = "3000",
+                                                                //            contentMediaID = Utils.ConvertToVietnameseNonSign(ProgramName).Replace(" ", "").ToLower() + "f",
+                                                                //            contentMediaRelativePath = Path.GetDirectoryName(Path.Combine(filesDB.UNC_BASE_PATH_DATA3, filesDB.FILE_NAME)).Substring(14).Replace("\\", "/") + "/",
+                                                                //            contentMediaSrcAssetType = "Clear_Asset_HD",
+                                                                //            contentMediaStorageDevice = "NAS",
+                                                                //            contentMediaType = "Source",
+                                                                //            contentPromoImages = Utils.ConvertToVietnameseNonSign(ProgramName.Replace(" ", "").ToLower().Trim()) + ".jpg",
+                                                                //            contentRating = "1",
+                                                                //            contentStartDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
+                                                                //            contentStudio = "VTVcab",
+                                                                //            contentSubtitles = "",
+                                                                //            contentTitle = Utils.ConvertToVietnameseNonSign(ProgramName),
+                                                                //            contentViCopyright = "",
+                                                                //            contentViDescription = filesDB.NOI_DUNG,
+                                                                //            contentViSynopsis = Utils.ConvertToVietnameseNonSign(ProgramName),
+                                                                //            contentViTitle = ProgramName,
+                                                                //            contentYear = Convert.ToDateTime(filesDB.DATE_TO_BROADCAST).Year.ToString(),
+
+                                                                //            vodItemContentRef = Utils.ConvertToVietnameseNonSign(ProgramName.Replace(" ", "").Trim()).ToLower() + "p",
+                                                                //            vodItemAction = "override",
+                                                                //            vodItemDisplayPriority = "LYS003582537/0",
+                                                                //            vodItemID = Utils.ConvertToVietnameseNonSign(ProgramName.Replace(" ", "").Trim()).ToLower() + "v",
+                                                                //            vodItemNodeRefList = "LYS003582537",
+                                                                //            vodItemPeriodEnd = DateTime.Now.AddYears(1).ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
+                                                                //            vodItemPeriodStart = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
+                                                                //            vodItemTitle = Utils.ConvertToVietnameseNonSign(ProgramName),
+
+                                                                //            productAction = "override",
+                                                                //            productCurrency = "VND",
+                                                                //            productElementId = Utils.ConvertToVietnameseNonSign(ProgramName.Replace(" ", "").Trim()).ToLower() + "v",
+                                                                //            productElementKind = "VodItem",
+                                                                //            productID = "LYS000041271",
+                                                                //            productPrice = "0",
+                                                                //            productTitle = "AVOD",
+                                                                //            productType = "subscription"
+
+                                                                //        };
+                                                                //        View.XMLShortObject xmlObject = new View.XMLShortObject();
+                                                                //        xmlObject.GenerateXml(xmlChild);
+                                                                //        var temp = Path.Combine(txtSaveFolder.Text, OriginalFileName + ".xml");
+                                                                //        xmlObject.SaveXmlFile(temp);
+                                                                //        addLog(logFile, "Xuat xml sang unc path tu nas thanh cong");
+                                                                //    }
+                                                                //    catch (Exception ex)
+                                                                //    {
+                                                                //        addLog(logFile, "Xuat xml sang unc path tu nas ko thanh cong: " + ex.ToString());
+                                                                //    }
+                                                                //}
                                                                 #endregion
                                                             }
-                                                            #region tap 2 tro len phim bo
-                                                            //else
-                                                            //{
-                                                            //    try
-                                                            //    {
-                                                            //        View.XMLShortChildObject xmlChild = new View.XMLShortChildObject()
-                                                            //        {
-                                                            //            rootID = "GLOBAL",
-                                                            //            rootScheduleDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
-
-                                                            //            contentNumber = epiNum.ToString(),
-                                                            //            contentSeriesRef = Utils.ConvertToVietnameseNonSign(ProgramName.Remove(ProgramName.LastIndexOf(epiNum.ToString()))).Replace(" ", "").ToLower() + "s",
-                                                            //            contentAction = "override",
-                                                            //            contentActors = filesDB.ACTOR,
-                                                            //            contentAspect = filesDB.ASPECT_RATIO,
-                                                            //            contentCategories = "",
-                                                            //            contentContentAction = "override",
-                                                            //            contentContentDefinition = filesDB.VIDEO_FORMAT,
-                                                            //            contentContentEncProfileName = "",
-                                                            //            contentContentID = Utils.ConvertToVietnameseNonSign(ProgramName).Replace(" ", "").ToLower() + "p",
-                                                            //            contentContentPreLoaded = "false",
-                                                            //            contentContentStartDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
-                                                            //            contentContentTitle = Utils.ConvertToVietnameseNonSign(ProgramName),
-                                                            //            contentCountries = "",
-                                                            //            contentDirectors = filesDB.DIRECTOR,
-                                                            //            contentDuration = ((int)TimeSpan.Parse(filesDB.TC_OUT).TotalSeconds).ToString(),
-                                                            //            contentID = Utils.ConvertToVietnameseNonSign(ProgramName).Replace(" ", "").ToLower() + "m",
-                                                            //            contentIsRecordable = "0",
-                                                            //            contentLanguage = "",
-                                                            //            contentMediaAction = "override",
-                                                            //            contentMediaFilename = Path.GetFileName(filesDB.FILE_NAME),
-                                                            //            contentMediaFileSize = filesDB.FILE_SIZE.ToString(),
-                                                            //            contentMediaFormat = "AV_ClearTS",
-                                                            //            contentMediaFrameDuration = "3000",
-                                                            //            contentMediaID = Utils.ConvertToVietnameseNonSign(ProgramName).Replace(" ", "").ToLower() + "f",
-                                                            //            contentMediaRelativePath = Path.GetDirectoryName(Path.Combine(filesDB.UNC_BASE_PATH_DATA3, filesDB.FILE_NAME)).Substring(14).Replace("\\", "/") + "/",
-                                                            //            contentMediaSrcAssetType = "Clear_Asset_HD",
-                                                            //            contentMediaStorageDevice = "NAS",
-                                                            //            contentMediaType = "Source",
-                                                            //            contentPromoImages = Utils.ConvertToVietnameseNonSign(ProgramName.Replace(" ", "").ToLower().Trim()) + ".jpg",
-                                                            //            contentRating = "1",
-                                                            //            contentStartDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
-                                                            //            contentStudio = "VTVcab",
-                                                            //            contentSubtitles = "",
-                                                            //            contentTitle = Utils.ConvertToVietnameseNonSign(ProgramName),
-                                                            //            contentViCopyright = "",
-                                                            //            contentViDescription = filesDB.NOI_DUNG,
-                                                            //            contentViSynopsis = Utils.ConvertToVietnameseNonSign(ProgramName),
-                                                            //            contentViTitle = ProgramName,
-                                                            //            contentYear = Convert.ToDateTime(filesDB.DATE_TO_BROADCAST).Year.ToString(),
-
-                                                            //            vodItemContentRef = Utils.ConvertToVietnameseNonSign(ProgramName.Replace(" ", "").Trim()).ToLower() + "p",
-                                                            //            vodItemAction = "override",
-                                                            //            vodItemDisplayPriority = "LYS003582537/0",
-                                                            //            vodItemID = Utils.ConvertToVietnameseNonSign(ProgramName.Replace(" ", "").Trim()).ToLower() + "v",
-                                                            //            vodItemNodeRefList = "LYS003582537",
-                                                            //            vodItemPeriodEnd = DateTime.Now.AddYears(1).ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
-                                                            //            vodItemPeriodStart = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
-                                                            //            vodItemTitle = Utils.ConvertToVietnameseNonSign(ProgramName),
-
-                                                            //            productAction = "override",
-                                                            //            productCurrency = "VND",
-                                                            //            productElementId = Utils.ConvertToVietnameseNonSign(ProgramName.Replace(" ", "").Trim()).ToLower() + "v",
-                                                            //            productElementKind = "VodItem",
-                                                            //            productID = "LYS000041271",
-                                                            //            productPrice = "0",
-                                                            //            productTitle = "AVOD",
-                                                            //            productType = "subscription"
-
-                                                            //        };
-                                                            //        View.XMLShortObject xmlObject = new View.XMLShortObject();
-                                                            //        xmlObject.GenerateXml(xmlChild);
-                                                            //        var temp = Path.Combine(txtSaveFolder.Text, OriginalFileName + ".xml");
-                                                            //        xmlObject.SaveXmlFile(temp);
-                                                            //        addLog(logFile, "Xuat xml sang unc path tu nas thanh cong");
-                                                            //    }
-                                                            //    catch (Exception ex)
-                                                            //    {
-                                                            //        addLog(logFile, "Xuat xml sang unc path tu nas ko thanh cong: " + ex.ToString());
-                                                            //    }
-                                                            //}
                                                             #endregion
-                                                        }
-                                                        #endregion
 
-                                                        #region Export Excel         
-                                                        if (ckExcel.Checked)
+                                                            #region Export Excel         
+                                                            if (ckExcel.Checked)
                                                             {
                                                                 try
                                                                 {
@@ -726,25 +730,26 @@ namespace HDExportMetadataAndFile
                                                                     InfoObj.ExportToXlsx(temp);
                                                                     if (uploadFromUnc(temp, Path.GetFileName(temp), txtNasIP.Text, nNasPort.Value.ToString(), txtNasPath.Text, txtNasUsername.Text, txtNasPass.Text))
                                                                     {
-                                                                    //ghi log
-                                                                    addLog(logFile, "Xuat excel thanh cong");
+                                                                        //ghi log
+                                                                        addLog(logFile, "Xuat excel thanh cong");
                                                                         File.Delete(temp);
                                                                     }
                                                                     else
                                                                     {
-                                                                    //ghi log
-                                                                    addLog(logFile, "Xuat excel ko thanh cong");
+                                                                        //ghi log
+                                                                        addLog(logFile, "Xuat excel ko thanh cong");
                                                                     }
                                                                 }
                                                                 catch (Exception ex)
                                                                 {
                                                                     addLog(logFile, "Co loi khi xuat excel: " + ex.ToString());
+                                                                    DeleteFileOverLength(logFile);
                                                                 }
                                                             }
-                                                        #endregion
+                                                            #endregion
 
-                                                        #region Export Media Highres
-                                                        bool uncHighresSuccess = false;
+                                                            #region Export Media Highres
+                                                            bool uncHighresSuccess = false;
                                                             if (ckMediaHighres.Checked && uncHighresPath != null && uncHighresPath.Length > 0)
                                                             {
                                                                 try
@@ -752,16 +757,16 @@ namespace HDExportMetadataAndFile
                                                                     if (uploadFromUnc(uncHighresPath + tempHighres, OriginalFileName + ".mxf", txtNasIP.Text, nNasPort.Value.ToString(), txtNasPath.Text, txtNasUsername.Text, txtNasPass.Text))
                                                                     {
                                                                         uncHighresSuccess = true;
-                                                                    //Ghi log
-                                                                    addLog(logFile, "Xuat highres bang unc thanh cong");
+                                                                        //Ghi log
+                                                                        addLog(logFile, "Xuat highres bang unc thanh cong");
                                                                     }
                                                                     else
                                                                     {
-                                                                    //Ghi log
-                                                                    addLog(logFile, "Ko xuat dc highres bang unc");
+                                                                        //Ghi log
+                                                                        addLog(logFile, "Ko xuat dc highres bang unc");
                                                                     }
                                                                 }
-                                                                catch (Exception ex) { addLog(logFile, "Loi khi xuat highres bang unc: " + ex.ToString()); }
+                                                                catch (Exception ex) { addLog(logFile, "Loi khi xuat highres bang unc: " + ex.ToString()); DeleteFileOverLength(logFile); }
                                                             }
                                                             if (ckMediaHighres.Checked && nasHighresPath != null && nasHighresPath.Length > 0 && !uncHighresSuccess)
                                                             {
@@ -770,21 +775,21 @@ namespace HDExportMetadataAndFile
                                                                     var tempSourcePath = srcPath + nasHighresPath;
                                                                     if (copyFile(tempHighres, OriginalFileName + ".mxf", tempSourcePath, filesDB.USERNAME, filesDB.PASSWORD, tempTargetPath, txtNasUsername.Text, txtNasPass.Text))
                                                                     {
-                                                                    //Ghi log
-                                                                    addLog(logFile, "Xuat highres bang ftp thanh cong");
+                                                                        //Ghi log
+                                                                        addLog(logFile, "Xuat highres bang ftp thanh cong");
                                                                     }
                                                                     else
                                                                     {
-                                                                    //Ghi log
-                                                                    addLog(logFile, "Ko xuat dc highres bang ftp");
+                                                                        //Ghi log
+                                                                        addLog(logFile, "Ko xuat dc highres bang ftp");
                                                                     }
                                                                 }
-                                                                catch (Exception ex) { addLog(logFile, "Loi khi xuat highres bang ftp: " + ex.ToString()); }
+                                                                catch (Exception ex) { addLog(logFile, "Loi khi xuat highres bang ftp: " + ex.ToString()); DeleteFileOverLength(logFile); }
                                                             }
-                                                        #endregion
+                                                            #endregion
 
-                                                        #region Export Media Lowres
-                                                        bool uncLowresSuccess = false;
+                                                            #region Export Media Lowres
+                                                            bool uncLowresSuccess = false;
                                                             if (ckMediaLowres.Checked && uncLowresPath != null && uncLowresPath.Length > 0)
                                                             {
                                                                 try
@@ -792,18 +797,19 @@ namespace HDExportMetadataAndFile
                                                                     if (uploadFromUnc(uncLowresPath + tempLowres, OriginalFileName + ".mp4", txtNasIP.Text, nNasPort.Value.ToString(), txtNasPath.Text, txtNasUsername.Text, txtNasPass.Text))
                                                                     {
                                                                         uncLowresSuccess = true;
-                                                                    //Ghi log
-                                                                    addLog(logFile, "Xuat Lowres bang unc thanh cong");
+                                                                        //Ghi log
+                                                                        addLog(logFile, "Xuat Lowres bang unc thanh cong");
                                                                     }
                                                                     else
                                                                     {
-                                                                    //Ghi log
-                                                                    addLog(logFile, "Ko xuat dc Lowres bang unc");
+                                                                        //Ghi log
+                                                                        addLog(logFile, "Ko xuat dc Lowres bang unc");
                                                                     }
                                                                 }
                                                                 catch (Exception ex)
                                                                 {
                                                                     addLog(logFile, "Loi khi xuat Lowres bang unc: " + ex.ToString());
+                                                                    DeleteFileOverLength(logFile);
                                                                 }
                                                             }
                                                             if (ckMediaLowres.Checked && nasLowresPath != null && nasLowresPath.Length > 0 && !uncLowresSuccess)
@@ -813,21 +819,21 @@ namespace HDExportMetadataAndFile
                                                                     var tempSourcePath = srcPath + nasLowresPath;
                                                                     if (copyFile(tempLowres, OriginalFileName + ".mp4", tempSourcePath, filesDB.USERNAME, filesDB.PASSWORD, tempTargetPath, txtNasUsername.Text, txtNasPass.Text))
                                                                     {
-                                                                    //Ghi log
-                                                                    addLog(logFile, "Xuat highres bang ftp thanh cong");
+                                                                        //Ghi log
+                                                                        addLog(logFile, "Xuat highres bang ftp thanh cong");
                                                                     }
                                                                     else
                                                                     {
-                                                                    //Ghi log
-                                                                    addLog(logFile, "ko xuat dc Lowres bang ftp");
+                                                                        //Ghi log
+                                                                        addLog(logFile, "ko xuat dc Lowres bang ftp");
                                                                     }
                                                                 }
-                                                                catch (Exception ex) { addLog(logFile, "Loi khi xuat Lowres bang ftp: " + ex.ToString()); }
+                                                                catch (Exception ex) { addLog(logFile, "Loi khi xuat Lowres bang ftp: " + ex.ToString()); DeleteFileOverLength(logFile); }
                                                             }
-                                                        #endregion
+                                                            #endregion
 
-                                                        #region Export ảnh
-                                                        bool uncPicSucess = false;
+                                                            #region Export ảnh
+                                                            bool uncPicSucess = false;
                                                             if (ckFullPic.Checked)
                                                             {
                                                                 try
@@ -836,54 +842,54 @@ namespace HDExportMetadataAndFile
                                                                     var picPathDb = db.Query<DAO.INFORTAPE_FILE_TYPE>(@"select * in INFORTAPE_FILE_TYPE where ID = 11").FirstOrDefault();
                                                                     if (picDb != null && picPathDb != null)
                                                                     {
-                                                                    //unc
-                                                                    try
+                                                                        //unc
+                                                                        try
                                                                         {
                                                                             if (uploadFromUnc("\\\\" + picDb.NAS_IP + "\\" + picPathDb.NAS_DATA_PATH + "\\" + picDb.FILE_NAME, OriginalFileName + "." + Path.GetExtension(picDb.FILE_NAME), txtNasIP.Text, nNasPort.Value.ToString(), txtNasPath.Text, txtNasUsername.Text, txtNasPass.Text))
                                                                             {
                                                                                 uncPicSucess = true;
-                                                                            //Ghi log
-                                                                            addLog(logFile, "Xuat poster bang unc thanh cong");
+                                                                                //Ghi log
+                                                                                addLog(logFile, "Xuat poster bang unc thanh cong");
                                                                             }
                                                                             else
                                                                             {
-                                                                            //Ghi log
-                                                                            addLog(logFile, "Xuat poster bang unc ko thanh cong");
+                                                                                //Ghi log
+                                                                                addLog(logFile, "Xuat poster bang unc ko thanh cong");
                                                                             }
                                                                         }
                                                                         catch (Exception ex)
                                                                         {
-                                                                            addLog(logFile, "Xuat poster bang unc ko thanh cong: " + ex.ToString());
+                                                                            addLog(logFile, "Xuat poster bang unc ko thanh cong: " + ex.ToString()); DeleteFileOverLength(logFile);
                                                                         }
-                                                                    //nas
-                                                                    if (!uncPicSucess)
+                                                                        //nas
+                                                                        if (!uncPicSucess)
                                                                         {
                                                                             try
                                                                             {
                                                                                 if (copyFile(picDb.FILE_NAME, OriginalFileName + "." + Path.GetExtension(picDb.FILE_NAME), "ftp://" + picDb.NAS_IP + ":" + picDb.PORT + "/" + picPathDb.NAS_DATA_PATH + "/" + picDb.FILE_NAME, picDb.USERNAME, picDb.PASSWORD, tempTargetPath, txtNasUsername.Text, txtNasPass.Text))
                                                                                 {
-                                                                                //Ghi log
-                                                                                addLog(logFile, "Xuat poster bang ftp thanh cong");
+                                                                                    //Ghi log
+                                                                                    addLog(logFile, "Xuat poster bang ftp thanh cong");
                                                                                 }
                                                                                 else
                                                                                 {
-                                                                                //Ghi log
-                                                                                addLog(logFile, "Xuat poster bang ftp ko thanh cong");
+                                                                                    //Ghi log
+                                                                                    addLog(logFile, "Xuat poster bang ftp ko thanh cong");
                                                                                 }
                                                                             }
-                                                                            catch (Exception ex) { addLog(logFile, "Xuat poster bang ftp ko thanh cong: " + ex.ToString()); }
+                                                                            catch (Exception ex) { addLog(logFile, "Xuat poster bang ftp ko thanh cong: " + ex.ToString()); DeleteFileOverLength(logFile); }
                                                                         }
                                                                     }
                                                                 }
                                                                 catch (Exception ex) { addLog(logFile, "Loi khi xuat poster: " + ex.ToString()); }
                                                             }
+                                                            #endregion
+
+                                                        }
                                                         #endregion
 
-                                                    }
-                                                    #endregion
-
-                                                    #region Export từ nas sang unc path
-                                                    if (txtSaveFolder.Text != null && txtSaveFolder.Text != "")
+                                                        #region Export từ nas sang unc path
+                                                        if (txtSaveFolder.Text != null && txtSaveFolder.Text != "")
                                                         {
                                                             try
                                                             {
@@ -891,12 +897,12 @@ namespace HDExportMetadataAndFile
                                                                 {
                                                                     Directory.CreateDirectory(txtSaveFolder.Text);
                                                                 }
-                                                            #region Export XML
-                                                            if (ckXml.Checked)
+                                                                #region Export XML
+                                                                if (ckXml.Checked)
                                                                 {
                                                                     int epiNum = getEpisodeNUmber(ProgramName);
-                                                                #region Phim le
-                                                                if (epiNum == 0)
+                                                                    #region Phim le
+                                                                    if (epiNum == 0)
                                                                     {
                                                                         try
                                                                         {
@@ -1020,13 +1026,13 @@ namespace HDExportMetadataAndFile
                                                                         }
                                                                         catch (Exception ex)
                                                                         {
-                                                                            addLog(logFile, "Xuat xml sang unc path tu unc path ko thanh cong: " + ex.ToString());
+                                                                            addLog(logFile, "Xuat xml sang unc path tu unc path ko thanh cong: " + ex.ToString()); DeleteFileOverLength(logFile);
                                                                         }
-                                                                    #endregion
-                                                                }
-                                                                #region Tap 1 phim bo
-                                                                else //if (epiNum == 1)
-                                                                {
+                                                                        #endregion
+                                                                    }
+                                                                    #region Tap 1 phim bo
+                                                                    else //if (epiNum == 1)
+                                                                    {
                                                                         try
                                                                         {
                                                                             View.XMLLongChildObject xmlChild = new View.XMLLongChildObject()
@@ -1161,97 +1167,97 @@ namespace HDExportMetadataAndFile
                                                                         }
                                                                         catch (Exception ex)
                                                                         {
-                                                                            addLog(logFile, "Xuat xml sang unc path tu unc path ko thanh cong: " + ex.ToString());
+                                                                            addLog(logFile, "Xuat xml sang unc path tu unc path ko thanh cong: " + ex.ToString()); DeleteFileOverLength(logFile);
                                                                         }
-                                                                    #endregion
+                                                                        #endregion
+                                                                    }
+                                                                    //#region tap 2 tro len phim bo
+                                                                    //else
+                                                                    //{
+                                                                    //    try
+                                                                    //    {
+                                                                    //        View.XMLShortChildObject xmlChild = new View.XMLShortChildObject()
+                                                                    //        {
+                                                                    //            rootID = "GLOBAL",
+                                                                    //            rootScheduleDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
+
+                                                                    //            contentNumber = epiNum.ToString(),
+                                                                    //            contentSeriesRef = Utils.ConvertToVietnameseNonSign(ProgramName.Remove(ProgramName.LastIndexOf(epiNum.ToString()))).Replace(" ", "").ToLower() + "s",
+                                                                    //            contentAction = "override",
+                                                                    //            contentActors = filesDB.ACTOR,
+                                                                    //            contentAspect = filesDB.ASPECT_RATIO,
+                                                                    //            contentCategories = "",
+                                                                    //            contentContentAction = "override",
+                                                                    //            contentContentDefinition = filesDB.VIDEO_FORMAT,
+                                                                    //            contentContentEncProfileName = "",
+                                                                    //            contentContentID = Utils.ConvertToVietnameseNonSign(ProgramName).Replace(" ", "").ToLower() + "p",
+                                                                    //            contentContentPreLoaded = "false",
+                                                                    //            contentContentStartDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
+                                                                    //            contentContentTitle = Utils.ConvertToVietnameseNonSign(ProgramName),
+                                                                    //            contentCountries = "",
+                                                                    //            contentDirectors = filesDB.DIRECTOR,
+                                                                    //            contentDuration = ((int)TimeSpan.Parse(filesDB.TC_OUT).TotalSeconds).ToString(),
+                                                                    //            contentID = Utils.ConvertToVietnameseNonSign(ProgramName).Replace(" ", "").ToLower() + "m",
+                                                                    //            contentIsRecordable = "0",
+                                                                    //            contentLanguage = "",
+                                                                    //            contentMediaAction = "override",
+                                                                    //            contentMediaFilename = Path.GetFileName(filesDB.FILE_NAME),
+                                                                    //            contentMediaFileSize = filesDB.FILE_SIZE.ToString(),
+                                                                    //            contentMediaFormat = "AV_ClearTS",
+                                                                    //            contentMediaFrameDuration = "3000",
+                                                                    //            contentMediaID = Utils.ConvertToVietnameseNonSign(ProgramName).Replace(" ", "").ToLower() + "f",
+                                                                    //            contentMediaRelativePath = Path.GetDirectoryName(Path.Combine(filesDB.UNC_BASE_PATH_DATA3, filesDB.FILE_NAME)).Substring(14).Replace("\\", "/") + "/",
+                                                                    //            contentMediaSrcAssetType = "Clear_Asset_HD",
+                                                                    //            contentMediaStorageDevice = "NAS",
+                                                                    //            contentMediaType = "Source",
+                                                                    //            contentPromoImages = Utils.ConvertToVietnameseNonSign(ProgramName.Replace(" ", "").ToLower().Trim()) + ".jpg",
+                                                                    //            contentRating = "1",
+                                                                    //            contentStartDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
+                                                                    //            contentStudio = "VTVcab",
+                                                                    //            contentSubtitles = "",
+                                                                    //            contentTitle = Utils.ConvertToVietnameseNonSign(ProgramName),
+                                                                    //            contentViCopyright = "",
+                                                                    //            contentViDescription = filesDB.NOI_DUNG,
+                                                                    //            contentViSynopsis = Utils.ConvertToVietnameseNonSign(ProgramName),
+                                                                    //            contentViTitle = ProgramName,
+                                                                    //            contentYear = Convert.ToDateTime(filesDB.DATE_TO_BROADCAST).Year.ToString(),
+
+                                                                    //            vodItemContentRef = Utils.ConvertToVietnameseNonSign(ProgramName.Replace(" ", "").Trim()).ToLower() + "p",
+                                                                    //            vodItemAction = "override",
+                                                                    //            vodItemDisplayPriority = "LYS003582537/0",
+                                                                    //            vodItemID = Utils.ConvertToVietnameseNonSign(ProgramName.Replace(" ", "").Trim()).ToLower() + "v",
+                                                                    //            vodItemNodeRefList = "LYS003582537",
+                                                                    //            vodItemPeriodEnd = DateTime.Now.AddYears(1).ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
+                                                                    //            vodItemPeriodStart = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
+                                                                    //            vodItemTitle = Utils.ConvertToVietnameseNonSign(ProgramName),
+
+                                                                    //            productAction = "override",
+                                                                    //            productCurrency = "VND",
+                                                                    //            productElementId = Utils.ConvertToVietnameseNonSign(ProgramName.Replace(" ", "").Trim()).ToLower() + "v",
+                                                                    //            productElementKind = "VodItem",
+                                                                    //            productID = "LYS000041271",
+                                                                    //            productPrice = "0",
+                                                                    //            productTitle = "AVOD",
+                                                                    //            productType = "subscription"
+
+                                                                    //        };
+                                                                    //        View.XMLShortObject xmlObject = new View.XMLShortObject();
+                                                                    //        xmlObject.GenerateXml(xmlChild);
+                                                                    //        var temp = Path.Combine(txtSaveFolder.Text, OriginalFileName + ".xml");
+                                                                    //        xmlObject.SaveXmlFile(temp);
+                                                                    //        addLog(logFile, "Xuat xml sang unc path tu unc path thanh cong");
+                                                                    //    }
+                                                                    //    catch (Exception ex)
+                                                                    //    {
+                                                                    //        addLog(logFile, "Xuat xml sang unc path tu unc path ko thanh cong: " + ex.ToString());
+                                                                    //    }
+                                                                    //}
+                                                                    //#endregion
                                                                 }
-                                                                //#region tap 2 tro len phim bo
-                                                                //else
-                                                                //{
-                                                                //    try
-                                                                //    {
-                                                                //        View.XMLShortChildObject xmlChild = new View.XMLShortChildObject()
-                                                                //        {
-                                                                //            rootID = "GLOBAL",
-                                                                //            rootScheduleDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
+                                                                #endregion
 
-                                                                //            contentNumber = epiNum.ToString(),
-                                                                //            contentSeriesRef = Utils.ConvertToVietnameseNonSign(ProgramName.Remove(ProgramName.LastIndexOf(epiNum.ToString()))).Replace(" ", "").ToLower() + "s",
-                                                                //            contentAction = "override",
-                                                                //            contentActors = filesDB.ACTOR,
-                                                                //            contentAspect = filesDB.ASPECT_RATIO,
-                                                                //            contentCategories = "",
-                                                                //            contentContentAction = "override",
-                                                                //            contentContentDefinition = filesDB.VIDEO_FORMAT,
-                                                                //            contentContentEncProfileName = "",
-                                                                //            contentContentID = Utils.ConvertToVietnameseNonSign(ProgramName).Replace(" ", "").ToLower() + "p",
-                                                                //            contentContentPreLoaded = "false",
-                                                                //            contentContentStartDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
-                                                                //            contentContentTitle = Utils.ConvertToVietnameseNonSign(ProgramName),
-                                                                //            contentCountries = "",
-                                                                //            contentDirectors = filesDB.DIRECTOR,
-                                                                //            contentDuration = ((int)TimeSpan.Parse(filesDB.TC_OUT).TotalSeconds).ToString(),
-                                                                //            contentID = Utils.ConvertToVietnameseNonSign(ProgramName).Replace(" ", "").ToLower() + "m",
-                                                                //            contentIsRecordable = "0",
-                                                                //            contentLanguage = "",
-                                                                //            contentMediaAction = "override",
-                                                                //            contentMediaFilename = Path.GetFileName(filesDB.FILE_NAME),
-                                                                //            contentMediaFileSize = filesDB.FILE_SIZE.ToString(),
-                                                                //            contentMediaFormat = "AV_ClearTS",
-                                                                //            contentMediaFrameDuration = "3000",
-                                                                //            contentMediaID = Utils.ConvertToVietnameseNonSign(ProgramName).Replace(" ", "").ToLower() + "f",
-                                                                //            contentMediaRelativePath = Path.GetDirectoryName(Path.Combine(filesDB.UNC_BASE_PATH_DATA3, filesDB.FILE_NAME)).Substring(14).Replace("\\", "/") + "/",
-                                                                //            contentMediaSrcAssetType = "Clear_Asset_HD",
-                                                                //            contentMediaStorageDevice = "NAS",
-                                                                //            contentMediaType = "Source",
-                                                                //            contentPromoImages = Utils.ConvertToVietnameseNonSign(ProgramName.Replace(" ", "").ToLower().Trim()) + ".jpg",
-                                                                //            contentRating = "1",
-                                                                //            contentStartDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
-                                                                //            contentStudio = "VTVcab",
-                                                                //            contentSubtitles = "",
-                                                                //            contentTitle = Utils.ConvertToVietnameseNonSign(ProgramName),
-                                                                //            contentViCopyright = "",
-                                                                //            contentViDescription = filesDB.NOI_DUNG,
-                                                                //            contentViSynopsis = Utils.ConvertToVietnameseNonSign(ProgramName),
-                                                                //            contentViTitle = ProgramName,
-                                                                //            contentYear = Convert.ToDateTime(filesDB.DATE_TO_BROADCAST).Year.ToString(),
-
-                                                                //            vodItemContentRef = Utils.ConvertToVietnameseNonSign(ProgramName.Replace(" ", "").Trim()).ToLower() + "p",
-                                                                //            vodItemAction = "override",
-                                                                //            vodItemDisplayPriority = "LYS003582537/0",
-                                                                //            vodItemID = Utils.ConvertToVietnameseNonSign(ProgramName.Replace(" ", "").Trim()).ToLower() + "v",
-                                                                //            vodItemNodeRefList = "LYS003582537",
-                                                                //            vodItemPeriodEnd = DateTime.Now.AddYears(1).ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
-                                                                //            vodItemPeriodStart = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH:mm:ss") + "Z",
-                                                                //            vodItemTitle = Utils.ConvertToVietnameseNonSign(ProgramName),
-
-                                                                //            productAction = "override",
-                                                                //            productCurrency = "VND",
-                                                                //            productElementId = Utils.ConvertToVietnameseNonSign(ProgramName.Replace(" ", "").Trim()).ToLower() + "v",
-                                                                //            productElementKind = "VodItem",
-                                                                //            productID = "LYS000041271",
-                                                                //            productPrice = "0",
-                                                                //            productTitle = "AVOD",
-                                                                //            productType = "subscription"
-
-                                                                //        };
-                                                                //        View.XMLShortObject xmlObject = new View.XMLShortObject();
-                                                                //        xmlObject.GenerateXml(xmlChild);
-                                                                //        var temp = Path.Combine(txtSaveFolder.Text, OriginalFileName + ".xml");
-                                                                //        xmlObject.SaveXmlFile(temp);
-                                                                //        addLog(logFile, "Xuat xml sang unc path tu unc path thanh cong");
-                                                                //    }
-                                                                //    catch (Exception ex)
-                                                                //    {
-                                                                //        addLog(logFile, "Xuat xml sang unc path tu unc path ko thanh cong: " + ex.ToString());
-                                                                //    }
-                                                                //}
-                                                                //#endregion
-                                                            }
-                                                            #endregion
-
-                                                            #region Export Excel
-                                                            if (ckExcel.Checked)
+                                                                #region Export Excel
+                                                                if (ckExcel.Checked)
                                                                 {
                                                                     try
                                                                     {
@@ -1290,26 +1296,26 @@ namespace HDExportMetadataAndFile
                                                                         InfoObj.ExportToXlsx(temp);
                                                                         addLog(logFile, "Xuat excel sang unc path tu unc path thanh cong");
                                                                     }
-                                                                    catch (Exception ex) { addLog(logFile, "Xuat excel sang unc path tu unc path ko thanh cong: " + ex.ToString()); }
+                                                                    catch (Exception ex) { addLog(logFile, "Xuat excel sang unc path tu unc path ko thanh cong: " + ex.ToString()); DeleteFileOverLength(logFile); }
                                                                 }
-                                                            #endregion
+                                                                #endregion
 
-                                                            #region copy highres
-                                                            if (ckMediaHighres.Checked)
+                                                                #region copy highres
+                                                                if (ckMediaHighres.Checked)
                                                                 {
-                                                                //unc
-                                                                bool uncSuccess = false;
+                                                                    //unc
+                                                                    bool uncSuccess = false;
                                                                     try
                                                                     {
                                                                         var t = Task.Run(() =>
                                                                         {
-                                                                            uncSuccess = FCopy(uncHighresPath + tempHighres, Path.Combine(txtSaveFolder.Text, OriginalFileName + ".mxf"));
+                                                                            uncSuccess = FCopy(Path.Combine(uncHighresPath, tempHighres), Path.Combine(txtSaveFolder.Text, OriginalFileName + ".mxf"));
                                                                         });
                                                                         t.Wait();
                                                                         if (uncSuccess)
                                                                         {
-                                                                        //Ghi log
-                                                                        addLog(logFile, "Xuat highres sang unc path tu unc path thanh cong");
+                                                                            //Ghi log
+                                                                            addLog(logFile, "Xuat highres sang unc path tu unc path thanh cong");
                                                                         }
                                                                         else
                                                                         {
@@ -1319,11 +1325,11 @@ namespace HDExportMetadataAndFile
                                                                     catch (Exception ex)
                                                                     {
                                                                         uncSuccess = false;
-                                                                    //Ghi log
-                                                                    addLog(logFile, "Xuat highres sang unc path tu unc path ko thanh cong: " + ex.ToString());
+                                                                        //Ghi log
+                                                                        addLog(logFile, "Xuat highres sang unc path tu unc path ko thanh cong: " + ex.ToString()); DeleteFileOverLength(logFile);
                                                                     }
-                                                                //ftp
-                                                                if (!uncSuccess)
+                                                                    //ftp
+                                                                    if (!uncSuccess)
                                                                     {
                                                                         try
                                                                         {
@@ -1337,27 +1343,27 @@ namespace HDExportMetadataAndFile
                                                                                     {
                                                                                         ftpClient.DownloadFile(tempSourcePath, Path.Combine(txtSaveFolder.Text, OriginalFileName + ".mxf"));
                                                                                     }
-                                                                                    catch (Exception ex) { addLog(logFile, "Loi xuat highres sang unc path tu ftp path: " + ex.ToString()); }
+                                                                                    catch (Exception ex) { addLog(logFile, "Loi xuat highres sang unc path tu ftp path: " + ex.ToString()); DeleteFileOverLength(logFile); }
                                                                                 });
                                                                                 t.Wait();
-                                                                            //Ghi log
-                                                                            addLog(logFile, "Xuat highres sang unc path tu ftp path thanh cong");
+                                                                                //Ghi log
+                                                                                addLog(logFile, "Xuat highres sang unc path tu ftp path thanh cong");
                                                                             }
                                                                         }
                                                                         catch (Exception ex)
                                                                         {
-                                                                        //Ghi log
-                                                                        addLog(logFile, "Xuat highres sang unc path tu ftp path ko thanh cong: " + ex.ToString());
+                                                                            //Ghi log
+                                                                            addLog(logFile, "Xuat highres sang unc path tu ftp path ko thanh cong: " + ex.ToString()); DeleteFileOverLength(logFile);
                                                                         }
                                                                     }
                                                                 }
-                                                            #endregion
+                                                                #endregion
 
-                                                            #region copy lowres
-                                                            if (ckMediaLowres.Checked)
+                                                                #region copy lowres
+                                                                if (ckMediaLowres.Checked)
                                                                 {
-                                                                //unc
-                                                                bool uncSuccess = false;
+                                                                    //unc
+                                                                    bool uncSuccess = false;
                                                                     try
                                                                     {
                                                                         var t = Task.Run(() =>
@@ -1367,8 +1373,8 @@ namespace HDExportMetadataAndFile
                                                                         t.Wait();
                                                                         if (uncSuccess)
                                                                         {
-                                                                        //Ghi log
-                                                                        addLog(logFile, "Xuat lowres sang unc path tu unc path thanh cong");
+                                                                            //Ghi log
+                                                                            addLog(logFile, "Xuat lowres sang unc path tu unc path thanh cong");
                                                                         }
                                                                         else
                                                                         {
@@ -1378,11 +1384,11 @@ namespace HDExportMetadataAndFile
                                                                     catch (Exception ex)
                                                                     {
                                                                         uncSuccess = false;
-                                                                    //Ghi log
-                                                                    addLog(logFile, "Xuat lowres sang unc path tu unc path ko thanh cong: " + ex.ToString());
+                                                                        //Ghi log
+                                                                        addLog(logFile, "Xuat lowres sang unc path tu unc path ko thanh cong: " + ex.ToString()); DeleteFileOverLength(logFile);
                                                                     }
-                                                                //ftp
-                                                                if (!uncSuccess)
+                                                                    //ftp
+                                                                    if (!uncSuccess)
                                                                     {
                                                                         try
                                                                         {
@@ -1398,25 +1404,25 @@ namespace HDExportMetadataAndFile
                                                                                     }
                                                                                     catch (Exception ex)
                                                                                     {
-                                                                                        addLog(logFile, "Loi khi xuat lowres sang unc path tu ftp path: " + ex.ToString());
+                                                                                        addLog(logFile, "Loi khi xuat lowres sang unc path tu ftp path: " + ex.ToString()); DeleteFileOverLength(logFile);
                                                                                     }
                                                                                 });
                                                                                 t.Wait();
-                                                                            //Ghi log
-                                                                            addLog(logFile, "Xuat lowres sang unc path tu ftp path thanh cong");
+                                                                                //Ghi log
+                                                                                addLog(logFile, "Xuat lowres sang unc path tu ftp path thanh cong");
                                                                             }
                                                                         }
                                                                         catch (Exception ex)
                                                                         {
-                                                                        //Ghi log
-                                                                        addLog(logFile, "Xuat lowres sang unc path tu ftp path ko thanh cong: " + ex.ToString());
+                                                                            //Ghi log
+                                                                            addLog(logFile, "Xuat lowres sang unc path tu ftp path ko thanh cong: " + ex.ToString()); DeleteFileOverLength(logFile);
                                                                         }
                                                                     }
                                                                 }
-                                                            #endregion
+                                                                #endregion
 
-                                                            #region Export ảnh
-                                                            if (ckFullPic.Checked)
+                                                                #region Export ảnh
+                                                                if (ckFullPic.Checked)
                                                                 {
                                                                     try
                                                                     {
@@ -1424,23 +1430,23 @@ namespace HDExportMetadataAndFile
                                                                         var picPathDb = db.Query<DAO.INFORTAPE_FILE_TYPE>(@"select * from INFORTAPE_FILE_TYPE where ID = 11").FirstOrDefault();
                                                                         if (picDb != null && picPathDb != null)
                                                                         {
-                                                                        //unc
-                                                                        bool uncSuccess = false;
+                                                                            //unc
+                                                                            bool uncSuccess = false;
                                                                             try
                                                                             {
                                                                                 File.Copy("\\\\" + picDb.NAS_IP + "\\" + picPathDb.NAS_DATA_PATH + "\\" + picDb.FILE_NAME, Path.Combine(txtSaveFolder.Text, OriginalFileName + "." + Path.GetExtension(picDb.FILE_NAME)));
                                                                                 uncSuccess = true;
-                                                                            //Ghi log
-                                                                            addLog(logFile, "Xuat poster sang unc path tu unc path thanh cong");
+                                                                                //Ghi log
+                                                                                addLog(logFile, "Xuat poster sang unc path tu unc path thanh cong");
                                                                             }
                                                                             catch (Exception ex)
                                                                             {
                                                                                 uncSuccess = false;
-                                                                            //Ghi log
-                                                                            addLog(logFile, "Xuat poster sang unc path tu unc path ko thanh cong: " + ex.ToString());
+                                                                                //Ghi log
+                                                                                addLog(logFile, "Xuat poster sang unc path tu unc path ko thanh cong: " + ex.ToString()); DeleteFileOverLength(logFile);
                                                                             }
-                                                                        //ftp
-                                                                        if (!uncSuccess)
+                                                                            //ftp
+                                                                            if (!uncSuccess)
                                                                             {
                                                                                 try
                                                                                 {
@@ -1448,30 +1454,34 @@ namespace HDExportMetadataAndFile
                                                                                     {
                                                                                         ftpClient.Credentials = new NetworkCredential(picDb.USERNAME, picDb.PASSWORD);
                                                                                         ftpClient.DownloadFile("ftp://" + picDb.NAS_IP + ":" + picDb.PORT + "/" + picPathDb.NAS_DATA_PATH + "/" + picDb.FILE_NAME, Path.Combine(txtSaveFolder.Text, OriginalFileName + "." + Path.GetExtension(picDb.FILE_NAME)));
-                                                                                    //Ghi log
-                                                                                    addLog(logFile, "Xuat poster sang unc path tu ftp path thanh cong");
+                                                                                        //Ghi log
+                                                                                        addLog(logFile, "Xuat poster sang unc path tu ftp path thanh cong");
                                                                                     }
                                                                                 }
                                                                                 catch (Exception ex)
                                                                                 {
-                                                                                //Ghi log
-                                                                                addLog(logFile, "Xuat poster sang unc path tu ftp path ko thanh cong: " + ex.ToString());
+                                                                                    //Ghi log
+                                                                                    addLog(logFile, "Xuat poster sang unc path tu ftp path ko thanh cong: " + ex.ToString()); DeleteFileOverLength(logFile);
                                                                                 }
                                                                             }
                                                                         }
                                                                     }
                                                                     catch (Exception ex)
                                                                     {
-                                                                        addLog(logFile, "Xuat poster sang unc path ko thanh cong: " + ex.ToString());
+                                                                        addLog(logFile, "Xuat poster sang unc path ko thanh cong: " + ex.ToString()); DeleteFileOverLength(logFile);
                                                                     }
-                                                                #endregion
-                                                            }
+                                                                    #endregion
+                                                                }
 
                                                             }
-                                                            catch (Exception ex) { addLog(logFile, "Loi khi export tu nas sang unc path: " + ex.ToString()); }
+                                                            catch (Exception ex)
+                                                            {
+                                                                addLog(logFile, "Loi khi export tu nas sang unc path: " + ex.ToString());
+                                                                DeleteFileOverLength(logFile);
+                                                            }
                                                         }
-                                                    #endregion
-                                                }
+                                                        #endregion
+                                                    }
                                                     else
                                                     {
                                                         addLog(logFile, "Khong tim duoc file trong he thong");
@@ -1481,6 +1491,7 @@ namespace HDExportMetadataAndFile
                                                 catch (Exception ex)
                                                 {
                                                     addLog(logFile, "Loi khi thuc hien task " + i.ToString() + ": " + ex.ToString());
+                                                    DeleteFileOverLength(logFile);
                                                 }
                                             });
                                         }
@@ -1496,7 +1507,7 @@ namespace HDExportMetadataAndFile
                                     }
                                     catch (Exception ex)
                                     {
-                                        addLog(logFile, "Loi khi Wait All tasks: " + ex.ToString());
+                                        addLog(logFile, "Loi khi Wait All tasks: " + ex.ToString()); DeleteFileOverLength(logFile);
                                     }
                                 }
                                 else
@@ -1511,14 +1522,14 @@ namespace HDExportMetadataAndFile
                         }
                         catch (Exception ex)
                         {
-                            addLog(logFile, "Loi khi ket noi db: " + ex.ToString());
+                            addLog(logFile, "Loi khi ket noi db: " + ex.ToString()); DeleteFileOverLength(logFile);
                         }
                     }
 
                 }
                 catch (Exception ex)
                 {
-                    addLog(logFile, "Loi ko xac dinh: " + ex.ToString());
+                    addLog(logFile, "Loi ko xac dinh: " + ex.ToString()); DeleteFileOverLength(logFile);
                 }
             }
         }
@@ -1739,7 +1750,7 @@ namespace HDExportMetadataAndFile
                         {
                             using (BinaryWriter bwwrite = new BinaryWriter(fswrite))
                             {
-                                for (;;)
+                                for (; ; )
                                 {
                                     int read = bwread.Read(dataArray, 0, array_length);
                                     if (0 == read)
@@ -1757,6 +1768,18 @@ namespace HDExportMetadataAndFile
                 return false;
             }
             return true;
+        }
+        void DeleteFileOverLength(string path)
+        {
+            var length = new FileInfo(path).Length;
+            if (length > 10000000)
+            {
+                try
+                {
+                    File.Delete(path);
+                }
+                catch { }
+            }
         }
     }
 }

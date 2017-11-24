@@ -131,6 +131,9 @@ namespace HDExportMetadataAndFile
             {
                 Directory.CreateDirectory(logFilePath);
             }
+            thrMain = new Thread(MainThread);
+            thrMain.IsBackground = true;
+            thrMain.Start();
         }
 
         private void btnConfig_Click(object sender, EventArgs e)
@@ -1540,12 +1543,14 @@ namespace HDExportMetadataAndFile
                 ckEditMode.Text = "Đang bật chế độ sửa cấu hình";
                 groupControl1.Enabled = true;
                 btnSave.Enabled = true;
+                isRunning = false;
             }
             else
             {
                 ckEditMode.Text = "Đã tắt chế độ sửa cấu hình";
                 groupControl1.Enabled = false;
                 btnSave.Enabled = false;
+                isRunning = true;
             }
         }
         private string getNumber(string str)

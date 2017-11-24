@@ -1525,12 +1525,12 @@ namespace HDExportMetadataAndFile
                             addLog(logFile, "Loi khi ket noi db: " + ex.ToString()); DeleteFileOverLength(logFile);
                         }
                     }
-
+                    Thread.Sleep(3000);
                 }
                 catch (Exception ex)
                 {
                     addLog(logFile, "Loi ko xac dinh: " + ex.ToString()); DeleteFileOverLength(logFile);
-                }
+                }                
             }
         }
         private void ckEditMode_CheckedChanged(object sender, EventArgs e)

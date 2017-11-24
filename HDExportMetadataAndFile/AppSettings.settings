@@ -2,7 +2,7 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="HDExportMetadataAndFile" GeneratedClassName="AppSettings">
   <Profiles />
   <Settings>
-    <Setting Name="ConnectionStr" Type="System.String" Scope="User">
+    <Setting Name="ConnectionStr" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Server=172.16.92.111;uid=sa;pwd=Vctv123456!DB;database=HDStation2VCTV;MultiSubnetFailover=True;ConnectRetryCount=3;ConnectRetryInterval=15;</Value>
     </Setting>
   </Settings>

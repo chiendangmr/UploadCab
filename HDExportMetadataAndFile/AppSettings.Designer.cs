@@ -12,7 +12,7 @@ namespace HDExportMetadataAndFile {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.3.0.0")]
     internal sealed partial class AppSettings : global::System.Configuration.ApplicationSettingsBase {
         
         private static AppSettings defaultInstance = ((AppSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new AppSettings())));
@@ -23,16 +23,13 @@ namespace HDExportMetadataAndFile {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Server=172.16.92.111;uid=sa;pwd=Vctv123456!DB;database=HDStation2VCTV;MultiSubnet" +
             "Failover=True;ConnectRetryCount=3;ConnectRetryInterval=15;")]
         public string ConnectionStr {
             get {
                 return ((string)(this["ConnectionStr"]));
-            }
-            set {
-                this["ConnectionStr"] = value;
             }
         }
     }
